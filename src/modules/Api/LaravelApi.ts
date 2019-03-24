@@ -8,7 +8,7 @@ import { UnauthorizedError } from '../Error/UnauthorizedError'
 import { NotFoundError } from '../Error/NotFoundError'
 
 export class LaravelApi implements ApiContract {
-  api: ApiInstance
+  private readonly api: ApiInstance
 
   constructor (api: ApiInstance) {
     this.api = api
@@ -78,14 +78,15 @@ export class LaravelApi implements ApiContract {
       }
       throw exception
     }
+    if (response.data) return response.data
     return response
   }
 
-  isNetworkErrorException (error: ApiProxyError) {
+  private isNetworkErrorException (error: ApiProxyError) {
     return error.message === 'Network Error'
   }
 
-  isApiException (error: ApiProxyError) {
+  private isApiException (error: ApiProxyError) {
     return !!error.response
   }
 }

@@ -24,7 +24,7 @@ describe('LaravelApi', () => {
     }
   }
 
-  describe('handleExceptions ', () => {
+  describe('handleAction ', () => {
     const api = new LaravelApi(new AxiosMock())
 
     describe(' should throw UnauthorizedError error', async () => {
@@ -112,11 +112,19 @@ describe('LaravelApi', () => {
         throw new Error('Network Error')
       }), NetworkError)
     })
-    test('should return data', async () => {
+    test('should return given in cb data', async () => {
       const result = await api.handleAction(() => {
-        return 1
+        return 'response'
       })
-      expect(result).toBe(result)
+      expect(result).toBe('response')
+    })
+    test('should return given in cb data without wrapper "data"', async () => {
+      const result = await api.handleAction(() => {
+        return {
+          data: 'response'
+        }
+      })
+      expect(result).toBe('response')
     })
   })
 
