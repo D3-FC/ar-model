@@ -1,52 +1,6 @@
 import LaravelQuery from '../../../src/modules/Query/LaravelQuery'
-import { ApiContract } from '../../../src/modules/Api/ApiContract'
-import { Dao } from '../../../src/modules/DAO/Dao'
-import { ConfigContract } from '../../../src/modules/Api/ConfigContract'
 import ArModel from '../../../src/modules/Model/ArModel'
-
-class ApiMock implements ApiContract {
-  url?: string
-  payload?: Dao
-  config?: ConfigContract
-
-  withWrapper: boolean = false
-
-  constructor (withWrapper: boolean = false) {
-    this.withWrapper = withWrapper
-  }
-
-  async delete (url: string, data?: Dao, config?: ConfigContract): Promise<any> {
-    this.url = url
-    this.payload = data
-    this.config = config
-    return 'response'
-  }
-
-  async get (url: string, data?: Dao, config?: ConfigContract): Promise<any> {
-    this.url = url
-    this.payload = data
-    this.config = config
-    return 'response'
-  }
-
-  async post (url: string, data?: Dao, config?: ConfigContract): Promise<any> {
-    this.url = url
-    this.payload = data
-    this.config = config
-    return 'response'
-  }
-
-  async put (url: string, data?: Dao, config?: ConfigContract): Promise<any> {
-    this.url = url
-    this.payload = data
-    this.config = config
-    return 'response'
-  }
-
-  setToken (token: string): void {
-  }
-
-}
+import { ApiMock } from './ApiMock'
 
 describe('LaravelQuery', () => {
   describe('"to" should set $resource and return query itself', () => {
@@ -59,6 +13,9 @@ describe('LaravelQuery', () => {
     })
     test('$resource from "ArModel" class name', () => {
       class MyModel extends ArModel {
+        constructor () {
+          super(new ApiMock())
+        }
       }
 
       const q = new LaravelQuery(new ApiMock())
@@ -69,8 +26,10 @@ describe('LaravelQuery', () => {
     test('$resource from "ArModel" "$resource"', () => {
       class MyModel extends ArModel {
         protected readonly $resource = 'resource'
+        constructor () {
+          super(new ApiMock())
+        }
       }
-
       const q = new LaravelQuery(new ApiMock())
 
       const result = q.to(new MyModel())

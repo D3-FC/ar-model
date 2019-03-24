@@ -3,8 +3,10 @@ import ArModel from '../Model/ArModel'
 import { Pagination } from './Pagination'
 import { Dao } from '../DAO/Dao'
 import { ApiContract } from '../Api/ApiContract'
+import { QueryContract } from '../Model/QueryContract'
+import { ModelContract } from './ModelContract'
 
-export default class LaravelQuery {
+export default class LaravelQuery implements QueryContract {
   private readonly $api: ApiContract
 
   private $resource: string = ''
@@ -17,7 +19,7 @@ export default class LaravelQuery {
     this.$api = api
   }
 
-  public to (resource: string | ArModel): this {
+  to (resource: string | ModelContract): this {
     if (resource instanceof ArModel) {
       if (resource.getResource()) {
         this.$resource = `/${resource.getResource()}`
@@ -27,7 +29,7 @@ export default class LaravelQuery {
       return this
     }
 
-    this.$resource = resource
+    this.$resource = resource as string
     return this
   }
 
@@ -35,12 +37,12 @@ export default class LaravelQuery {
     return this.$resource
   }
 
-  public expandUrl (url?: string | number | null): this {
+  expandUrl (url?: string | number | null): this {
     this.$resource = this.makeUrl(url)
     return this
   }
 
-  public makeUrl (urlPartial?: string | number | null) {
+  makeUrl (urlPartial?: string | number | null) {
     let baseUrl = this.getResource()
 
     if (urlPartial) {
@@ -49,7 +51,7 @@ export default class LaravelQuery {
     return baseUrl
   }
 
-  public setCriteria (criteria: Dao): this {
+  setCriteria (criteria: Dao): this {
     this.$criteria = criteria
     return this
   }
@@ -63,7 +65,7 @@ export default class LaravelQuery {
     return this.get(payload)
   }
 
-  public async get (payload?: Dao, url?: string): Promise<Dao> {
+  async get (payload?: Dao, url?: string): Promise<any> {
     if (!payload) {
       payload = {
         ...this.$criteria,
@@ -76,7 +78,7 @@ export default class LaravelQuery {
     return this.$api.get(url, payload)
   }
 
-  public async first (): Promise<Dao | null> {
+  async first (): Promise<Dao | null> {
     const result = await this.get()
     if (!Array.isArray(result)) {
       return result
@@ -87,7 +89,7 @@ export default class LaravelQuery {
     return null
   }
 
-  public async post (payload?: object, url?: string): Promise<Dao> {
+  async post (payload?: object, url?: string): Promise<any> {
     if (!payload) {
       payload = this.$payload
     }
@@ -97,7 +99,7 @@ export default class LaravelQuery {
     return this.$api.post(url, payload)
   }
 
-  public async put (payload?: object, url?: string): Promise<Dao> {
+  async put (payload?: object, url?: string): Promise<any> {
     if (!payload) {
       payload = this.$payload
     }
@@ -107,7 +109,7 @@ export default class LaravelQuery {
     return this.$api.put(url, payload)
   }
 
-  public async delete (payload?: object, url?: string): Promise<void> {
+  async delete (payload?: object, url?: string): Promise<any> {
     if (!payload) {
       payload = this.$payload
     }
@@ -117,12 +119,12 @@ export default class LaravelQuery {
     return this.$api.delete(url, payload)
   }
 
-  public setPagination (pagination: Pagination) {
+  setPagination (pagination: Pagination) {
     this.$pagination = pagination
     return this
   }
 
-  public setPayload (payload: object): this {
+  setPayload (payload: object): this {
     this.$payload = payload
     return this
   }
