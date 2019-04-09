@@ -1,3 +1,3 @@
-export interface Dao {
+export interface Dto {
   [key: string]: any
 }

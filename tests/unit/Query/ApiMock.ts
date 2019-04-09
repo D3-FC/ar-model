@@ -1,10 +1,10 @@
 import { ApiContract } from '../../../src/modules/Api/ApiContract'
-import { Dao } from '../../../src/modules/DAO/Dao'
+import { Dto } from '../../../src/modules/DAO/Dto'
 import { ConfigContract } from '../../../src/modules/Api/ConfigContract'
 
 export class ApiMock implements ApiContract {
   url?: string
-  payload?: Dao
+  payload?: Dto
   config?: ConfigContract
 
   withWrapper: boolean = false
@@ -13,28 +13,28 @@ export class ApiMock implements ApiContract {
     this.withWrapper = withWrapper
   }
 
-  async delete (url: string, data?: Dao, config?: ConfigContract): Promise<any> {
+  async delete (url: string, data?: Dto, config?: ConfigContract): Promise<any> {
     this.url = url
     this.payload = data
     this.config = config
     return 'response'
   }
 
-  async get (url: string, data?: Dao, config?: ConfigContract): Promise<any> {
+  async get (url: string, data?: Dto, config?: ConfigContract): Promise<any> {
     this.url = url
     this.payload = data
     this.config = config
     return 'response'
   }
 
-  async post (url: string, data?: Dao, config?: ConfigContract): Promise<any> {
+  async post (url: string, data?: Dto, config?: ConfigContract): Promise<any> {
     this.url = url
     this.payload = data
     this.config = config
     return 'response'
   }
 
-  async put (url: string, data?: Dao, config?: ConfigContract): Promise<any> {
+  async put (url: string, data?: Dto, config?: ConfigContract): Promise<any> {
     this.url = url
     this.payload = data
     this.config = config

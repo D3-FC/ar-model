@@ -1,5 +1,5 @@
 import { AppError } from './AppError'
-import { Dao } from '../DAO/Dao'
+import { Dto } from '../DAO/Dto'
 
 export class UnauthorizedError extends AppError {
   static DEFAULT_MESSAGE: string = 'Unauthenticated'
@@ -9,7 +9,7 @@ export class UnauthorizedError extends AppError {
   previous: any
   data: any
 
-  constructor (data: Dao = {}) {
+  constructor (data: Dto = {}) {
     super(data)
     Object.assign(this, data)
   }

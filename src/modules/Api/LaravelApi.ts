@@ -1,5 +1,5 @@
 import { ApiContract } from './ApiContract'
-import { Dao } from '../DAO/Dao'
+import { Dto } from '../DAO/Dto'
 import { ApiProxyError, ApiInstance, ApiRequestConfig } from './ConfigTypes'
 import { ApiError } from '../Error/ApiError'
 import { NetworkError } from '../Error/NetworkError'
@@ -14,22 +14,22 @@ export class LaravelApi implements ApiContract {
     this.api = api
   }
 
-  async delete (url: string, data?: Dao): Promise<any> {
+  async delete (url: string, data?: Dto): Promise<any> {
     return this.handleAction(() => this.api.delete(url, data))
   }
 
-  async get (url: string, data?: Dao, config?: ApiRequestConfig): Promise<any> {
+  async get (url: string, data?: Dto, config?: ApiRequestConfig): Promise<any> {
     return this.handleAction(() => this.api.get(url, {
       ...config,
       params: data
     }))
   }
 
-  async post (url: string, data?: Dao, config?: ApiRequestConfig): Promise<any> {
+  async post (url: string, data?: Dto, config?: ApiRequestConfig): Promise<any> {
     return this.handleAction(() => this.post(url, data, config))
   }
 
-  async put (url: string, data?: Dao, config?: ApiRequestConfig): Promise<any> {
+  async put (url: string, data?: Dto, config?: ApiRequestConfig): Promise<any> {
     return this.handleAction(() => this.put(url, data, config))
   }
 

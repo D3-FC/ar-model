@@ -1,7 +1,7 @@
 import { ApiContract } from '../Api/ApiContract'
 import { ValidationError } from '../Error/Validation/ValidationError'
 import HoldExecutor from '../Executor/HoldExecutor'
-import { Dao } from '../DAO/Dao'
+import { Dto } from '../DAO/Dto'
 import { QueryContract } from './QueryContract'
 import LaravelQuery from '../Query/LaravelQuery'
 import { ArCollection } from '../Collection/ArCollection'
@@ -9,11 +9,14 @@ import { clone } from '../Helper/CloneHelpers'
 import { ModelContract } from '../Query/ModelContract'
 
 export default class ArModel implements ModelContract {
+  [key: string]: any
+
   protected readonly $resource: string = ''
+  protected $snapshot: Dto = {}
   protected readonly $api: ApiContract
 
   protected readonly $idKey: string = 'id'
-  protected $error: ValidationError = new ValidationError()
+  protected $validation: ValidationError = new ValidationError()
 
   protected readonly $updateExecutor: HoldExecutor = new HoldExecutor(this.updateAction)
   protected readonly $storeExecutor: HoldExecutor = new HoldExecutor(() => this.storeAction())
@@ -23,7 +26,7 @@ export default class ArModel implements ModelContract {
     this.$api = api
   }
 
-  fill (data: Dao | ArModel): this {
+  fill (data: Dto | ArModel): this {
     Object.assign(this, data)
     return this
   }
@@ -32,18 +35,18 @@ export default class ArModel implements ModelContract {
     return this.$resource
   }
 
-  map (data: Dao) {
-    this.fill(clone(data))
+  map (data: Dto): this {
+    return this.fill(clone(data))
   }
 
-  mapOrNull (data?: Dao): this | null {
+  mapOrNull (data?: Dto): this | null {
     if (!(data && typeof data === 'object')) return null
     this.map(data)
     return this
   }
 
   public getId (): string | number | null {
-    const self = this as Dao
+    const self = this as Dto
     return self[this.$idKey] ? self[this.$idKey] : null
   }
 
@@ -51,9 +54,9 @@ export default class ArModel implements ModelContract {
     return !!this.getId()
   }
 
-  public toObject (): Dao {
-    const result: Dao = {}
-    const self = this as Dao
+  public toObject (): Dto {
+    const result: Dto = {}
+    const self = this as Dto
     this.getAttributes().forEach(attribute => {
       const attributeValue = self[attribute]
       if (attributeValue instanceof ArModel ||
@@ -89,6 +92,52 @@ export default class ArModel implements ModelContract {
     return result
   }
 
+  public toRequest (): Dto {
+    return this.toObject()
+  }
+
+  protected getAttributes () {
+    return Object.keys(this).filter((key: string) => {
+      return !key.startsWith('$')
+    })
+  }
+
+  errorsFor (attribute: string): string[] {
+    const error = this.$validation.getError(attribute)
+    if (typeof error === 'string') return [error]
+    if (!error) return []
+    return error
+  }
+
+  errorFor (attribute: string): string {
+    return this.errorsFor(attribute)[0] || ''
+  }
+
+  get hasError () {
+    return this.$validation.hasErrors
+  }
+
+  clearErrors (): this {
+    this.$validation.clear()
+    return this
+  }
+
+  toString () {
+    return JSON.stringify(this.toObject(), null, '\t')
+  }
+
+  get () {
+    return this.query().get()
+  }
+
+  all () {
+    return this.get()
+  }
+
+  paginate () {
+    return this.query().paginate()
+  }
+
   get isSaving (): boolean {
     return this.isUpdating || this.isStoring
   }
@@ -105,7 +154,7 @@ export default class ArModel implements ModelContract {
     return this.$destroyExecutor.isRunning
   }
 
-  public newQuery (): QueryContract {
+  protected query (): QueryContract {
     return new LaravelQuery(this.$api).to(this)
   }
 
@@ -146,14 +195,14 @@ export default class ArModel implements ModelContract {
       return await action()
     } catch (e) {
       if (e instanceof ValidationError) {
-        this.$error = e
+        this.$validation = e
       }
       throw e
     }
   }
 
-  async post (url?: string, data: any = this.toRequest()): Promise<any> {
-    const q = this.newQuery()
+  protected async post (url?: string, data: any = this.toRequest()): Promise<any> {
+    const q = this.query()
     if (url) q.to(url)
     q.setPayload(data)
     return this.handleAction(() => q.post())
@@ -161,7 +210,7 @@ export default class ArModel implements ModelContract {
 
   protected async put (url?: string, data: any = this.toRequest()): Promise<any> {
     const id = this.getId()
-    const q = this.newQuery()
+    const q = this.query()
     if (url) q.to(url)
     if (!url && id) q.expandUrl(id)
     q.setPayload(data)
@@ -170,13 +219,13 @@ export default class ArModel implements ModelContract {
 
   protected async delete (url?: string): Promise<void> {
     const id = this.getId()
-    const q = this.newQuery()
+    const q = this.query()
     if (url) q.to(url)
     if (!url && id) q.expandUrl(id)
     await q.delete()
   }
 
-  protected merge (modelData: ArModel | Dao): this {
+  merge (modelData: ArModel | Dto): this {
     let data = {}
     if (modelData instanceof ArModel) {
       data = modelData.toObject()
@@ -188,29 +237,12 @@ export default class ArModel implements ModelContract {
     return this
   }
 
-  protected getAttributes () {
-    return Object.keys(this).filter((key: string) => {
-      return !key.startsWith('$') && !(<any>key instanceof ArCollection) && !(<any>key instanceof ArModel)
-    })
+  snapshot (): this {
+    this.$snapshot = clone(this.toObject())
+    return this
   }
 
-  public toRequest (): Dao {
-    return this.toObject()
-  }
-
-  toString () {
-    return JSON.stringify(this.toObject(), null, '\t')
-  }
-
-  get () {
-    return this.newQuery().get()
-  }
-
-  all () {
-    return this.get()
-  }
-
-  paginate () {
-    return this.newQuery().paginate()
+  reset (): this {
+    return this.map(this.$snapshot)
   }
 }

@@ -1,6 +1,6 @@
 import { PropertyError } from './PropertyError'
 import { toCamelCase } from '../../Helper/StringHelpers'
-import { Dao } from '../../DAO/Dao'
+import { Dto } from '../../DAO/Dto'
 
 export default class PropertyCollectionError {
   errors: PropertyError[] = []
@@ -27,7 +27,7 @@ export default class PropertyCollectionError {
     this.errors = []
   }
 
-  static createFromLaravelError (laravelErrors: Dao) {
+  static createFromLaravelError (laravelErrors: Dto) {
     let errors = Object.keys(laravelErrors.errors).map(key => {
       const value = laravelErrors.errors[key]
       return new PropertyError({ key: toCamelCase(key), value })

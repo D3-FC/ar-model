@@ -1,5 +1,5 @@
 import { ApiContract } from './ApiContract'
-import { Dao } from '../DAO/Dao'
+import { Dto } from '../DAO/Dto'
 import { ConfigContract } from './ConfigContract'
 import { ValidationError } from '../Error/Validation/ValidationError'
 import { UnauthorizedError } from '../Error/UnauthorizedError'
@@ -14,19 +14,19 @@ export class LaravelProxy implements ApiContract {
     this.api = api
   }
 
-  async delete (url: string, data?: Dao, config?: ConfigContract): Promise<void> {
+  async delete (url: string, data?: Dto, config?: ConfigContract): Promise<void> {
     await this.handleExceptions(() => this.api.delete(url, data))
   }
 
-  async get (url: string, data?: Dao, config?: ConfigContract): Promise<any> {
+  async get (url: string, data?: Dto, config?: ConfigContract): Promise<any> {
     return this.handleExceptions(() => this.api.get(url, data), config && config.noWrapper)
   }
 
-  async post (url: string, data?: Dao, config?: ConfigContract): Promise<any> {
+  async post (url: string, data?: Dto, config?: ConfigContract): Promise<any> {
     return this.handleExceptions(() => this.api.post(url, data, config), config && config.noWrapper)
   }
 
-  async put (url: string, data?: Dao, config?: ConfigContract): Promise<any> {
+  async put (url: string, data?: Dto, config?: ConfigContract): Promise<any> {
     return this.handleExceptions(() => this.api.put(url, data, config), config && config.noWrapper)
   }
 

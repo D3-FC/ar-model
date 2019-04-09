@@ -1,7 +1,7 @@
 import { toKebabCase } from '../Helper/StringHelpers'
 import ArModel from '../Model/ArModel'
 import { Pagination } from './Pagination'
-import { Dao } from '../DAO/Dao'
+import { Dto } from '../DAO/Dto'
 import { ApiContract } from '../Api/ApiContract'
 import { QueryContract } from '../Model/QueryContract'
 import { ModelContract } from './ModelContract'
@@ -10,9 +10,9 @@ export default class LaravelQuery implements QueryContract {
   private readonly $api: ApiContract
 
   private $resource: string = ''
-  private $criteria: Dao = {}
-  private $payload: Dao = {}
-  private $pagination: Dao = {}
+  private $criteria: Dto = {}
+  private $payload: Dto = {}
+  private $pagination: Dto = {}
   private $urlWasExpanded = false
 
   constructor (api: ApiContract) {
@@ -51,7 +51,7 @@ export default class LaravelQuery implements QueryContract {
     return baseUrl
   }
 
-  setCriteria (criteria: Dao): this {
+  setCriteria (criteria: Dto): this {
     this.$criteria = criteria
     return this
   }
@@ -65,7 +65,7 @@ export default class LaravelQuery implements QueryContract {
     return this.get(payload)
   }
 
-  async get (payload?: Dao, url?: string): Promise<any> {
+  async get (payload?: Dto, url?: string): Promise<any> {
     if (!payload) {
       payload = {
         ...this.$criteria,
@@ -78,7 +78,7 @@ export default class LaravelQuery implements QueryContract {
     return this.$api.get(url, payload)
   }
 
-  async first (): Promise<Dao | null> {
+  async first (): Promise<Dto | null> {
     const result = await this.get()
     if (!Array.isArray(result)) {
       return result

@@ -1,5 +1,5 @@
 import ArModel from '../Model/ArModel'
-import { Dao } from '../DAO/Dao'
+import { Dto } from '../DAO/Dto'
 
 export class ArCollection {
   protected $items: ArModel[] = []
@@ -8,7 +8,7 @@ export class ArCollection {
     this.$items = items
   }
 
-  public toObject (): Dao {
+  public toObject (): Dto {
     return this.$items.map((item: ArModel) => item.toObject())
   }
 }
