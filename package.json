@@ -5,9 +5,9 @@
   "productName": "Ar Model",
   "author": "Dimitri <d3-fc@mail.ru>",
   "private": false,
-  "types": "./dist/types/components/Planimator/planimator.d.ts",
-  "main": "./dist/planimator.js",
-  "module": "./dist/planimator.js",
+  "types": "./lib/index.ts",
+  "main": "./lib/index.ts",
+  "module": "./lib/index.ts",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
