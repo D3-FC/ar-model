@@ -7,6 +7,7 @@ import LaravelQuery from '../Query/LaravelQuery'
 import { ArCollection } from '../Collection/ArCollection'
 import { clone } from '../Helper/CloneHelpers'
 import { ModelContract } from '../Query/ModelContract'
+import { objectPropsToCamelCase } from '../Helper/ObjectHelper'
 
 export default class ArModel implements ModelContract {
   [key: string]: any
@@ -27,7 +28,11 @@ export default class ArModel implements ModelContract {
   }
 
   fill (data: Dto | ArModel): this {
-    Object.assign(this, data)
+    if (data instanceof ArModel) {
+      Object.assign(this, data.toObject())
+      return this
+    }
+    Object.assign(this, objectPropsToCamelCase(data))
     return this
   }
 
