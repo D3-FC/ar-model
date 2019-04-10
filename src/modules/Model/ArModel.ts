@@ -32,6 +32,7 @@ export default class ArModel implements ModelContract {
     Object.assign(this, data)
     return this
   }
+
   // TODO: test
   fillAndTransform (data: Dto | ArModel): this {
     Object.assign(this, objectPropsToCamelCase(data))
@@ -274,6 +275,16 @@ export default class ArModel implements ModelContract {
 
   reset (): this {
     this.map(this.$snapshot)
+    return this
+  }
+
+  clone (): this {
+    /**
+     * TODO: overload
+     * clone = new Model()
+     * clone.merge(this)
+     * return clone
+     */
     return this
   }
 }

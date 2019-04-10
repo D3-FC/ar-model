@@ -32,4 +32,22 @@ export class ArCollection<T> {
 
     return this.removeByCriteria(itemOrCriteria)
   }
+
+  clone () {
+    return this.$items.map((m) => {
+      return m.clone()
+    })
+  }
+
+  add (item: T & ArModel, index: number = 0) {
+    this.$items.splice(index, 0, item)
+  }
+
+  push (item: T & ArModel) {
+    this.$items.push()
+  }
+
+  prepend (item: T & ArModel) {
+    this.$items.push()
+  }
 }
