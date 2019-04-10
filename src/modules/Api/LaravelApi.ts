@@ -78,7 +78,10 @@ export class LaravelApi implements ApiContract {
       }
       throw exception
     }
-    if (response && response.data) return response.data
+    // TODO: write tests
+    if (response && response.data && response.data.data) {
+      return response.data.data
+    }
     return response
   }
 
