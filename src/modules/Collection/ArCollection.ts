@@ -4,18 +4,18 @@ import { arrayFindByCriteria, arrayRemove, arrayRemoveByCriteria } from '../Help
 
 type Criteria = Dto | ((item: ArModel) => boolean)
 
-export class ArCollection {
-  protected $items: ArModel[] = []
+export class ArCollection<T> {
+  protected $items: (T & ArModel)[] = []
 
-  constructor (items: ArModel[] = []) {
+  constructor (items: (T & ArModel)[] = []) {
     this.$items = items
   }
 
   toObject (): Dto {
-    return this.$items.map((item: ArModel) => item.toObject())
+    return this.$items.map((item) => item.toObject())
   }
 
-  find (criteria: Dto | Criteria): ArModel | null {
+  find (criteria: Dto | Criteria): T | null {
     return arrayFindByCriteria(this.$items, criteria)
   }
 
