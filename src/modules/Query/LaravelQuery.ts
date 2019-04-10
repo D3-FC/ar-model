@@ -43,6 +43,12 @@ export default class LaravelQuery implements QueryContract {
   }
 
   makeUrl (urlPartial?: string | number | null) {
+    if (urlPartial && (typeof urlPartial === 'string') && urlPartial.startsWith('/')) {
+      urlPartial = urlPartial.substring(1)
+    }
+    if (urlPartial && (typeof urlPartial === 'string') && urlPartial.endsWith('/')) {
+      urlPartial = urlPartial.substring(0, urlPartial.length - 1)
+    }
     let baseUrl = this.getResource()
 
     if (urlPartial) {

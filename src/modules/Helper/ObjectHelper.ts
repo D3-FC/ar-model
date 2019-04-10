@@ -8,6 +8,11 @@ export function objectPropsToCamelCase (data: Dto) {
     const camelCaseProp = toCamelCase(prop)
     const propValue = data[prop]
 
+    if (!propValue) {
+      result[camelCaseProp] = propValue
+      return
+    }
+
     if (Array.isArray(propValue)) {
       result[camelCaseProp] = propValue.map(objectPropsToCamelCase)
       return

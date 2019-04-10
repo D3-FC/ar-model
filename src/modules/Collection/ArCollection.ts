@@ -11,4 +11,5 @@ export class ArCollection {
   public toObject (): Dto {
     return this.$items.map((item: ArModel) => item.toObject())
   }
+
 }

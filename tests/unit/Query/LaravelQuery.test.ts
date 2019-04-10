@@ -26,10 +26,12 @@ describe('LaravelQuery', () => {
     test('$resource from "ArModel" "$resource"', () => {
       class MyModel extends ArModel {
         protected readonly $resource = 'resource'
+
         constructor () {
           super(new ApiMock())
         }
       }
+
       const q = new LaravelQuery(new ApiMock())
 
       const result = q.to(new MyModel())
@@ -89,6 +91,14 @@ describe('LaravelQuery', () => {
         const result = q.to('/to').expandUrl('1').expandUrl('expanded').expandUrl('2').makeUrl('name')
 
         expect(result).toEqual('/to/1/expanded/2/name')
+      })
+    test('should trim "/" before and after ',
+      () => {
+        const q = new LaravelQuery(new ApiMock())
+
+        const result = q.makeUrl('/name/')
+
+        expect(result).toEqual('/name')
       })
   })
 

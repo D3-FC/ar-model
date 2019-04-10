@@ -4,6 +4,7 @@ describe('ObjectHelpers', () => {
   test('objectPropsToCamelCase', () => {
     const data = {
       some_name: 'some name',
+      nullable: null,
       relation_one: {
         some_name: 'some name'
       },
@@ -15,6 +16,7 @@ describe('ObjectHelpers', () => {
     }
     const expected = {
       someName: 'some name',
+      nullable: null,
       relationOne: {
         someName: 'some name'
       },

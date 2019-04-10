@@ -27,11 +27,13 @@ export default class ArModel implements ModelContract {
     this.$api = api
   }
 
+  // TODO: test
   fill (data: Dto | ArModel): this {
-    if (data instanceof ArModel) {
-      Object.assign(this, data.toObject())
-      return this
-    }
+    Object.assign(this, data)
+    return this
+  }
+  // TODO: test
+  fillAndTransform (data: Dto | ArModel): this {
     Object.assign(this, objectPropsToCamelCase(data))
     return this
   }
@@ -40,8 +42,23 @@ export default class ArModel implements ModelContract {
     return this.$resource
   }
 
+  /**
+   * TODO: sometimes we might want to not map some data from request;
+   * So would be good to have attributes scheme of attributes and its defaults
+   * $attributes = {
+   *   id: null
+   * }
+   * if attributes are defined we will map from them, if not we will map everything from given data
+   *
+   * we also want to have methods with relations like in Laravel
+   * for "practice" we will have practice() method.
+   * this methods will help us make nested queries like:
+   * this.practice().find(id) will generate url - "/resources/{id}/practices/{id}"
+   * @param data
+   */
   map (data: Dto): this {
-    return this.fill(clone(data))
+    this.fill(clone(data))
+    return this
   }
 
   mapOrNull (data?: Dto): this | null {
@@ -72,7 +89,6 @@ export default class ArModel implements ModelContract {
       }
 
       if (Array.isArray(attributeValue) && attributeValue.some((av) => (av instanceof ArModel))) {
-
         result[attribute] = attributeValue.map((element) => {
           if (element instanceof ArModel) {
             return element.toObject()
@@ -206,6 +222,18 @@ export default class ArModel implements ModelContract {
     }
   }
 
+  // TODO: write tests
+  protected async find (url?: string, data: any = this.toRequest()): Promise<this> {
+    const id = this.getId()
+    const q = this.query()
+    if (url) q.to(url)
+    if (!url && id) q.expandUrl(id)
+    q.setPayload(data)
+    const response = this.handleAction(() => q.get())
+    this.map(response)
+    return this
+  }
+
   protected async post (url?: string, data: any = this.toRequest()): Promise<any> {
     const q = this.query()
     if (url) q.to(url)
@@ -235,9 +263,6 @@ export default class ArModel implements ModelContract {
     if (modelData instanceof ArModel) {
       data = modelData.toObject()
     }
-    if (typeof modelData === 'object') {
-      data = clone(modelData)
-    }
     this.map(data)
     return this
   }
@@ -248,6 +273,7 @@ export default class ArModel implements ModelContract {
   }
 
   reset (): this {
-    return this.map(this.$snapshot)
+    this.map(this.$snapshot)
+    return this
   }
 }
