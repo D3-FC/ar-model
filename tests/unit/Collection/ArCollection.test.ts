@@ -74,4 +74,34 @@ describe('ArCollection', () => {
       ])
     })
   })
+  describe('add', () => {
+    test('should add item to given position', () => {
+      const col = new ArCollection([
+        m1,
+        m3
+      ])
+      col.add(m2, 1)
+      expect(col.toObject()).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }])
+    })
+  })
+  describe('push', () => {
+    test('should push item to the end', () => {
+      const col = new ArCollection([
+        m1,
+        m3
+      ])
+      col.push(m2)
+      expect(col.toObject()).toEqual([{ id: 1 }, { id: 3 }, { id: 2 }])
+    })
+  })
+  describe('push', () => {
+    test('should push item to the end', () => {
+      const col = new ArCollection([
+        m1,
+        m3
+      ])
+      col.prepend(m2)
+      expect(col.toObject()).toEqual([{ id: 2 }, { id: 1 }, { id: 3 }])
+    })
+  })
 })

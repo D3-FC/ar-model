@@ -44,10 +44,10 @@ export class ArCollection<T> {
   }
 
   push (item: T & ArModel) {
-    this.$items.push()
+    this.$items.push(item)
   }
 
   prepend (item: T & ArModel) {
-    this.$items.push()
+    this.$items.unshift(item)
   }
 }
