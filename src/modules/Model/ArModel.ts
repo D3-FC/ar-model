@@ -9,6 +9,7 @@ import { clone } from '../Helper/CloneHelpers'
 import { ModelContract } from '../Query/ModelContract'
 import { objectPropsToCamelCase } from '../Helper/ObjectHelper'
 
+// TODO: think how to make auto tests for api response and mapping
 export default class ArModel implements ModelContract {
   [key: string]: any
 
@@ -68,6 +69,10 @@ export default class ArModel implements ModelContract {
     return this
   }
 
+  public getIdName (): string {
+    return this.$idKey
+  }
+
   public getId (): string | number | null {
     const self = this as Dto
     return self[this.$idKey] ? self[this.$idKey] : null
@@ -77,6 +82,7 @@ export default class ArModel implements ModelContract {
     return !!this.getId()
   }
 
+  // TODO: add new type for dates
   public toObject (): Dto {
     const result: Dto = {}
     const self = this as Dto

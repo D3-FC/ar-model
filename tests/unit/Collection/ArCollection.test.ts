@@ -61,13 +61,63 @@ describe('ArCollection', () => {
         { id: 3 }
       ])
     })
-    test('should remove model found by given model', () => {
+    test('should remove model found by given model using id as identifier', () => {
       const col = new ArCollection([
         m1,
         m2,
         m3
       ])
-      col.remove(m1)
+      const m1Clone = new Model().merge(m1)
+      col.remove(m1Clone)
+      expect(col.toObject()).toEqual([
+        { id: 2 },
+        { id: 3 }
+      ])
+    })
+    test('should remove model found by given model using given identifier name', () => {
+      class Model extends ArModel {
+        id!: number
+        $idKey = 'someId'
+
+        constructor (data: Dto = {}) {
+          super(new ApiMock())
+          this.fill(data)
+        }
+      }
+
+      const m1 = new Model({ someId: 1 })
+      const col = new ArCollection([
+        m1,
+        m2,
+        m3
+      ])
+
+      const m1Clone = new Model().merge(m1)
+      col.remove(m1Clone, 'someId')
+      expect(col.toObject()).toEqual([
+        { id: 2 },
+        { id: 3 }
+      ])
+    })
+    test('should remove model found by given model using identifier from given model', () => {
+      class Model extends ArModel {
+        $idKey = 'someId'
+
+        constructor (data: Dto = {}) {
+          super(new ApiMock())
+          this.fill(data)
+        }
+      }
+
+      const m1 = new Model({ someId: 1 })
+      const col = new ArCollection([
+        m1,
+        m2,
+        m3
+      ])
+
+      const m1Clone = new Model().merge(m1)
+      col.remove(m1Clone)
       expect(col.toObject()).toEqual([
         { id: 2 },
         { id: 3 }

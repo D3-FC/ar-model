@@ -26,11 +26,11 @@ export class LaravelApi implements ApiContract {
   }
 
   async post (url: string, data?: Dto, config?: ApiRequestConfig): Promise<any> {
-    return this.handleAction(() => this.post(url, data, config))
+    return this.handleAction(() => this.api.post(url, data, config))
   }
 
   async put (url: string, data?: Dto, config?: ApiRequestConfig): Promise<any> {
-    return this.handleAction(() => this.put(url, data, config))
+    return this.handleAction(() => this.api.put(url, data, config))
   }
 
   setToken (token: string): void {

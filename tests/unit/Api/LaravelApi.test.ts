@@ -1,5 +1,5 @@
 import { LaravelApi } from '../../../src/modules/Api/LaravelApi'
-import { ApiInstance, ApiRequestConfig, ApiResponse } from '../../../src/modules/Api/ConfigTypes'
+import { ApiInstance, ApiRequestConfig } from '../../../src/modules/Api/ConfigTypes'
 import { NetworkError } from '../../../src/modules/Error/NetworkError'
 import { expectThrow } from '../../../src/modules/Helper/TestHelpers'
 import { UnauthorizedError } from '../../../src/modules/Error/UnauthorizedError'
@@ -38,6 +38,7 @@ describe('LaravelApi', () => {
           }
         }
       }
+
       test('error instance should be UnauthorizedError', async () => {
         await expectThrow(() => api.handleAction(() => {
           throw new CustomError('CustomError')
@@ -66,6 +67,7 @@ describe('LaravelApi', () => {
           }
         }
       }
+
       test('error instance should be NotFoundError', async () => {
         await expectThrow(() => api.handleAction(() => {
           throw new CustomError('CustomError')
@@ -91,6 +93,7 @@ describe('LaravelApi', () => {
           }
         }
       }
+
       test('error instance should be ApiError', async () => {
         await expectThrow(() => api.handleAction(() => {
           throw new CustomError('CustomError')
@@ -124,7 +127,7 @@ describe('LaravelApi', () => {
           data: 'response'
         }
       })
-      expect(result).toBe('response')
+      expect(result).toEqual({ data: 'response' })
     })
   })
 

@@ -1,6 +1,6 @@
 import ArModel from '../Model/ArModel'
 import { Dto } from '../DAO/Dto'
-import { arrayFindByCriteria, arrayRemove, arrayRemoveByCriteria } from '../Helper/ArrayHelpers'
+import { arrayFindByCriteria, arrayRemoveByCriteria } from '../Helper/ArrayHelpers'
 
 type Criteria = Dto | ((item: ArModel) => boolean)
 
@@ -19,16 +19,16 @@ export class ArCollection<T> {
     return arrayFindByCriteria(this.$items, criteria)
   }
 
-  protected removeItem (item: ArModel) {
-    arrayRemove(this.$items, item)
+  protected removeItem (item: ArModel, key: string = item.getIdName()) {
+    this.removeByCriteria({ [key]: item.getId() })
   }
 
   protected removeByCriteria (criteria: Criteria) {
     arrayRemoveByCriteria(this.$items, criteria)
   }
 
-  remove (itemOrCriteria: ArModel | Criteria) {
-    if (itemOrCriteria instanceof ArModel) return this.removeItem(itemOrCriteria)
+  remove (itemOrCriteria: ArModel | Criteria, key?:string) {
+    if (itemOrCriteria instanceof ArModel) return this.removeItem(itemOrCriteria, key)
 
     return this.removeByCriteria(itemOrCriteria)
   }
