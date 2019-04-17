@@ -62,7 +62,7 @@ export default class LaravelQuery implements QueryContract {
     return this
   }
 
-  paginate (page: number = 1, perPage: number = 30) {
+  paginate (page: number = 1, perPage: number = 30): Promise<Dto[]> {
     const payload = {
       ...this.$criteria,
       page,
@@ -133,5 +133,9 @@ export default class LaravelQuery implements QueryContract {
   setPayload (payload: object): this {
     this.$payload = payload
     return this
+  }
+
+  getUrl(){
+    this.makeUrl()
   }
 }

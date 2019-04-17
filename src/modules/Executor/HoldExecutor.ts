@@ -5,9 +5,12 @@ import Executor from './Executor'
  * Busy requests will get infinite promise.
  */
 export default class HoldExecutor extends Executor {
+  promise: Promise<any> | null = null
+
   async run (...parameters: any[]): Promise<any> {
     if (!this.isRunning) {
-      return super.run(...parameters)
+      this.promise = super.run(...parameters)
+      return this.promise
     }
   }
 }

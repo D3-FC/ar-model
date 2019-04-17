@@ -1,11 +1,12 @@
 import { ApiContract } from './ApiContract'
 import { Dto } from '../DAO/Dto'
-import { ApiProxyError, ApiInstance, ApiRequestConfig } from './ConfigTypes'
+import { ApiInstance, ApiProxyError, ApiRequestConfig } from './ConfigTypes'
 import { ApiError } from '../Error/ApiError'
 import { NetworkError } from '../Error/NetworkError'
 import { ValidationError } from '../Error/Validation/ValidationError'
 import { UnauthorizedError } from '../Error/UnauthorizedError'
 import { NotFoundError } from '../Error/NotFoundError'
+import { objectPropsToCamelCase, objectPropsToSnakeCase } from '../Helper/ObjectHelper'
 
 export class LaravelApi implements ApiContract {
   private readonly api: ApiInstance
@@ -14,22 +15,29 @@ export class LaravelApi implements ApiContract {
     this.api = api
   }
 
+  transformData (data: Dto) {
+    return objectPropsToSnakeCase(data)
+  }
+
   async delete (url: string, data?: Dto): Promise<any> {
+    data = data ? this.transformData(data) : undefined // TODO: write tests
     return this.handleAction(() => this.api.delete(url, data))
   }
 
   async get (url: string, data?: Dto, config?: ApiRequestConfig): Promise<any> {
     return this.handleAction(() => this.api.get(url, {
       ...config,
-      params: data
+      params: data ? this.transformData(data) : undefined // TODO: write tests
     }))
   }
 
   async post (url: string, data?: Dto, config?: ApiRequestConfig): Promise<any> {
+    data = data ? this.transformData(data) : undefined // TODO: write tests
     return this.handleAction(() => this.api.post(url, data, config))
   }
 
   async put (url: string, data?: Dto, config?: ApiRequestConfig): Promise<any> {
+    data = data ? this.transformData(data) : undefined // TODO: write tests
     return this.handleAction(() => this.api.put(url, data, config))
   }
 
@@ -80,9 +88,13 @@ export class LaravelApi implements ApiContract {
     }
     // TODO: write tests
     if (response && response.data && response.data.data) {
-      return response.data.data
+      const data = response.data.data
+      if (Array.isArray(data)) {
+        return data.map(item => objectPropsToCamelCase(item))
+      }
+      return objectPropsToCamelCase(response.data.data)
     }
-    return response
+    return objectPropsToCamelCase(response.data)
   }
 
   private isNetworkErrorException (error: ApiProxyError) {

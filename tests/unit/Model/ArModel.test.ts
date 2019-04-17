@@ -312,9 +312,10 @@ describe('ArModel', () => {
       const m1 = new Model()
       m1.name = 'name 1'
       const m2 = new Model()
+      m2.id = 'new id'
       m2.name = 'name 2'
       m2.merge(m1)
-      expect(m2.name).toEqual('name 1')
+      expect(m2.toObject()).toEqual({ id: 'new id', name: 'name 1' })
     })
 
     test('changing model2 should not lead changes in model1', async () => {

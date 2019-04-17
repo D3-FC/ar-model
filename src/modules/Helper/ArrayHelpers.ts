@@ -35,3 +35,26 @@ export function arrayFindByCriteria<T> (array: T[], criteria: Criteria): T | nul
     }
   ) || null
 }
+
+/**
+ * Find item by criteria.
+ */
+export function arrayFindIndexByCriteria (array: any[], criteria: Criteria): number {
+  return array.findIndex(
+    item => {
+      return typeof criteria === 'function'
+        ? criteria(item)
+        : objectMeetsCriteria(item, criteria)
+    }
+  )
+}
+
+export function arraySpliceOrNewByCriteria<T> (array: T[], criteria: Dto | Function, item: T, addIndex = 0) {
+  const index = arrayFindIndexByCriteria(array, criteria)
+
+  if (index >= 0) {
+    array.splice(index, 1, item)
+    return
+  }
+  array.splice(addIndex, 0, item)
+}

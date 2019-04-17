@@ -1,7 +1,17 @@
 import { Dto } from '../DAO/Dto'
-import { toCamelCase } from './StringHelpers'
+import { toCamelCase, toSnakeCase } from './StringHelpers'
+
+export class IgnoreTransform implements Dto {
+  [key: string]: any
+
+  constructor (data: Dto) {
+    Object.assign(this, data)
+  }
+}
 
 export function objectPropsToCamelCase (data: Dto) {
+  if (data instanceof IgnoreTransform) return data
+
   const props = Object.keys(data)
   const result: Dto = {}
   props.forEach((prop: string) => {
@@ -14,7 +24,11 @@ export function objectPropsToCamelCase (data: Dto) {
     }
 
     if (Array.isArray(propValue)) {
-      result[camelCaseProp] = propValue.map(objectPropsToCamelCase)
+      result[camelCaseProp] = propValue.map(
+        (value) => {
+          if (!value || !(typeof value === 'object')) return value
+          return objectPropsToCamelCase(value)
+        })
       return
     }
 
@@ -26,5 +40,39 @@ export function objectPropsToCamelCase (data: Dto) {
     result[camelCaseProp] = propValue
   })
 
+  return result
+}
+
+export function objectPropsToSnakeCase (data: Dto) {
+  if (data instanceof IgnoreTransform) {
+    return data
+  }
+  const props = Object.keys(data)
+  const result: Dto = {}
+  props.forEach((prop: string) => {
+    const kebabCaseProp = toSnakeCase(prop)
+    const propValue = data[prop]
+
+    if (!propValue) {
+      result[kebabCaseProp] = propValue
+      return
+    }
+
+    if (Array.isArray(propValue)) {
+      result[kebabCaseProp] = propValue.map(
+        (value) => {
+          if (!value || !(typeof value === 'object')) return value
+          return objectPropsToSnakeCase(value)
+        })
+      return
+    }
+
+    if (typeof propValue === 'object') {
+      result[kebabCaseProp] = objectPropsToSnakeCase(propValue)
+      return
+    }
+
+    result[kebabCaseProp] = propValue
+  })
   return result
 }

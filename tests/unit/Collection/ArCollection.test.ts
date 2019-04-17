@@ -42,7 +42,7 @@ describe('ArCollection', () => {
         m3
       ])
       col.remove({ id: 1 })
-      expect(col.toObject()).toEqual([
+      expect(col.toArray()).toEqual([
         { id: 2 },
         { id: 3 }
       ])
@@ -56,7 +56,7 @@ describe('ArCollection', () => {
       col.remove((model) => {
         return model.id === 1
       })
-      expect(col.toObject()).toEqual([
+      expect(col.toArray()).toEqual([
         { id: 2 },
         { id: 3 }
       ])
@@ -69,7 +69,7 @@ describe('ArCollection', () => {
       ])
       const m1Clone = new Model().merge(m1)
       col.remove(m1Clone)
-      expect(col.toObject()).toEqual([
+      expect(col.toArray()).toEqual([
         { id: 2 },
         { id: 3 }
       ])
@@ -94,7 +94,7 @@ describe('ArCollection', () => {
 
       const m1Clone = new Model().merge(m1)
       col.remove(m1Clone, 'someId')
-      expect(col.toObject()).toEqual([
+      expect(col.toArray()).toEqual([
         { id: 2 },
         { id: 3 }
       ])
@@ -118,7 +118,7 @@ describe('ArCollection', () => {
 
       const m1Clone = new Model().merge(m1)
       col.remove(m1Clone)
-      expect(col.toObject()).toEqual([
+      expect(col.toArray()).toEqual([
         { id: 2 },
         { id: 3 }
       ])
@@ -131,7 +131,7 @@ describe('ArCollection', () => {
         m3
       ])
       col.add(m2, 1)
-      expect(col.toObject()).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }])
+      expect(col.toArray()).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }])
     })
   })
   describe('push', () => {
@@ -141,7 +141,7 @@ describe('ArCollection', () => {
         m3
       ])
       col.push(m2)
-      expect(col.toObject()).toEqual([{ id: 1 }, { id: 3 }, { id: 2 }])
+      expect(col.toArray()).toEqual([{ id: 1 }, { id: 3 }, { id: 2 }])
     })
   })
   describe('push', () => {
@@ -151,7 +151,27 @@ describe('ArCollection', () => {
         m3
       ])
       col.prepend(m2)
-      expect(col.toObject()).toEqual([{ id: 2 }, { id: 1 }, { id: 3 }])
+      expect(col.toArray()).toEqual([{ id: 2 }, { id: 1 }, { id: 3 }])
+    })
+  })
+  describe('addOrReplace', () => {
+    test('should add to the beginning', () => {
+      const col = new ArCollection([
+        m1,
+        m3
+      ])
+      col.addOrMerge(m2)
+      expect(col.toArray()).toEqual([{ id: 2 }, { id: 1 }, { id: 3 }])
+    })
+    test('should replace m2', () => {
+      const col = new ArCollection([
+        m1,
+        m2,
+        m3
+      ])
+      const m4 = m2.merge(new Model({ name: 'name' }))
+      col.addOrMerge(m2)
+      expect(col.toArray()).toEqual([{ id: 1 }, { id: 2, name: 'name' }, { id: 3 }])
     })
   })
 })
