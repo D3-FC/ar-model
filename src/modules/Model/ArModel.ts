@@ -6,7 +6,7 @@ import LaravelQuery from '../Query/LaravelQuery'
 import { ArCollection } from '../Collection/ArCollection'
 import { clone } from '../Helper/CloneHelpers'
 import { ModelContract } from '../Query/ModelContract'
-import { objectPropsToCamelCase } from '../Helper/ObjectHelper'
+import { objectClone, objectPropsToCamelCase } from '../Helper/ObjectHelper'
 import { getUIID } from '../Helper/StringHelpers'
 import HoldExecutor from '../Executor/HoldExecutor'
 
@@ -366,7 +366,7 @@ export default class ArModel implements ModelContract {
         }
 
         if (typeof attributeValue === 'object') {
-          this[attribute] = clone(attributeValue)
+          this[attribute] = objectClone(attributeValue)
           return
         }
 
@@ -386,8 +386,7 @@ export default class ArModel implements ModelContract {
   }
 
   get wasChanged (): boolean {
-    const r = this.$snapshot !== this.toSnapshotString()
-    return r
+    return this.$snapshot !== this.toSnapshotString()
   }
 
   reset (): this {
@@ -395,12 +394,6 @@ export default class ArModel implements ModelContract {
   }
 
   clone (): this {
-    /**
-     * TODO: overload
-     * clone = new Model()
-     * clone.merge(this)
-     * return clone
-     */
     return this.newStatic().merge(this)
   }
 
