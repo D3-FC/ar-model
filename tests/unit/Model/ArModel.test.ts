@@ -9,6 +9,7 @@ import { PropertyError } from '../../../src/modules/Error/Validation/PropertyErr
 
 describe('ArModel', () => {
   class QueryMock implements QueryContract {
+
     url?: string | ArModel
     payload?: Dto
 
@@ -50,6 +51,10 @@ describe('ArModel', () => {
       this.url = resource
       return this
     }
+
+    setCriteria (criteria: object): this {
+      return this
+    }
   }
 
   class QueryMockThrowableValidationError implements QueryContract {
@@ -86,6 +91,10 @@ describe('ArModel', () => {
     }
 
     to (resource: string | ArModel): this {
+      return this
+    }
+
+    setCriteria (criteria: object): this {
       return this
     }
   }
@@ -348,5 +357,90 @@ describe('ArModel', () => {
     m1.name = 'name 1'
     m1.reset()
     expect(m1.name).toEqual('name')
+  })
+
+  describe('clone', async () => {
+    class Model extends ArModel {
+      constructor (data: Dto = {}) {
+        super(new ApiMock())
+        this.fill(data)
+      }
+    }
+
+    test('nested date should be cloned', async () => {
+      const m1 = new Model({
+        date: new Date()
+      })
+      const m2 = m1.clone()
+      m1.date.setHours(5)
+      expect(m2.date === m1.date).toBeFalsy()
+    })
+    test('nested expanded date should be cloned', async () => {
+      class ExpandedDate extends Date {
+        clone () {
+          return new ExpandedDate(this)
+        }
+      }
+
+      const m1 = new Model({
+        date: new ExpandedDate()
+      })
+      const m2 = m1.clone()
+      m1.date.setHours(5)
+      expect(m2.date === m1.date).toBeFalsy()
+      expect(m2.date).toBeInstanceOf(ExpandedDate)
+    })
+    test('nested object should be cloned', async () => {
+      const m1 = new Model({
+        object1: {
+          object2: {
+            name: 1
+          }
+        }
+      })
+      const m2 = m1.clone()
+      m1.object1.object2.name = 2
+      expect(m2.object1.object2.name).toEqual(1)
+    })
+    test('nested array should be cloned', async () => {
+      const m1 = new Model({
+        arr1: [
+          {
+            arr2: [
+              1
+            ]
+          }
+        ]
+      })
+      const m2 = m1.clone()
+      m1.arr1[0].arr2[0] = 2
+      expect(m2.arr1[0].arr2[0]).toEqual(1)
+    })
+    test('nested Model should be cloned', async () => {
+      const m1 = new Model({
+        mNested1: new Model({
+          mNested2: new Model({
+            name: 1
+          })
+        })
+      })
+      const m2 = m1.clone()
+      m1.mNested1.mNested2.name = 2
+      expect(m2.mNested1.mNested2.name).toEqual(1)
+    })
+    test('nested ArCollection should be cloned', async () => {
+      const m1 = new ArCollection([
+        new Model({
+          cl: new ArCollection([
+            new Model({
+              name: 1
+            })
+          ])
+        })
+      ])
+      const m2 = m1.clone()
+      m1.first.cl.first.name = 2
+      expect(m2.first.cl.first.name).toEqual(1)
+    })
   })
 })

@@ -95,4 +95,12 @@ export class ArCollection<T> {
   get length () {
     return this.$items.length
   }
+
+  toSnapshotString () {
+    return this.$items.map(item => item.toSnapshotString())
+  }
+
+  get first () {
+    return this.$items[0]
+  }
 }

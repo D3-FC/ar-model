@@ -16,7 +16,7 @@ export default class ArModel implements ModelContract {
   [key: string]: any
 
   protected readonly $resource: string = ''
-  protected $snapshot: Dto = {}
+  protected $snapshot: string = ''
   protected readonly $api: ApiContract
 
   protected $hash: string = getUIID()
@@ -27,6 +27,7 @@ export default class ArModel implements ModelContract {
   protected readonly $storeExecutor: HoldExecutor = new HoldExecutor((...args: any) => this.storeAction(...args))
   protected readonly $destroyExecutor: HoldExecutor = new HoldExecutor((...args: any) => this.destroyAction(...args))
   public $findExecutor: HoldExecutor = this.makeExecutor((...args: any) => this.findAction(...args))
+  public $freshExecutor: HoldExecutor = this.makeExecutor((...args: any) => this.freshAction(...args))
 
   makeExecutor (cb: ExecutorCommand) {
     return new HoldExecutor(cb)
@@ -38,6 +39,10 @@ export default class ArModel implements ModelContract {
 
   get isFinding () {
     return this.$findExecutor.isRunning
+  }
+
+  get isFreshing () {
+    return this.$freshExecutor.isRunning
   }
 
   // TODO: test
@@ -245,13 +250,18 @@ export default class ArModel implements ModelContract {
     return this
   }
 
+  // TODO: tests
+  public async freshAction (id?: string | number, url?: string): Promise<this> {
+    await this.waitForStoring()
+    return this.findAction(this.id, url)
+  }
+
   find (id: string | number | Dto, url?: string) {
     return this.$findExecutor.run(id, url)
   }
 
   public async fresh (url?: string): Promise<this> {
-    await this.waitForStoring()
-    return this.$findExecutor.run(this.id, url)
+    return this.$freshExecutor.run(this.id, url)
   }
 
   public async update (url?: string, data?: any) {
@@ -331,40 +341,70 @@ export default class ArModel implements ModelContract {
    * NOTE: we also use that to clone model as temp solution
    */
   merge (modelData: ArModel | Dto): this {
-    let data = modelData
-    if (modelData instanceof ArModel) {
-      data = modelData.toObject()
-      this.$hash = modelData.$hash
-    }
     if (!(modelData instanceof ArModel)) {
-      data = clone(data)
+      this.map(clone(modelData))
     }
-    this.map(data)
+    if (modelData instanceof ArModel) {
+      this.$hash = modelData.$hash
+
+      modelData.getAttributes().forEach(attribute => {
+
+        const attributeValue = modelData[attribute]
+        if ((attributeValue instanceof ArModel) || (attributeValue instanceof ArCollection)) {
+          this[attribute] = attributeValue.clone()
+          return
+        }
+
+        if (attributeValue instanceof Date) {
+
+          if (typeof (attributeValue as any).clone === 'function') {
+            this[attribute] = (attributeValue as any).clone()
+            return
+          }
+          this[attribute] = new Date(attributeValue)
+          return
+        }
+
+        if (typeof attributeValue === 'object') {
+          this[attribute] = clone(attributeValue)
+          return
+        }
+
+        this[attribute] = attributeValue
+      })
+    }
     return this
+  }
+
+  toSnapshotString () {
+    return JSON.stringify(this)
   }
 
   snapshot (): this {
-    this.$snapshot = clone(this.toObject())
+    this.$snapshot = this.toSnapshotString()
     return this
+  }
+
+  get wasChanged (): boolean {
+    const r = this.$snapshot !== this.toSnapshotString()
+    return r
   }
 
   reset (): this {
-    this.map(this.$snapshot)
     return this
   }
 
-  clone (...args: any[]): this {
+  clone (): this {
     /**
      * TODO: overload
      * clone = new Model()
      * clone.merge(this)
      * return clone
      */
-    return this.newStatic(...args).merge(this)
+    return this.newStatic().merge(this)
   }
 
-  newStatic (...args: any[]) {
-    // @ts-ignore
-    return new this.constructor(...args)
+  newStatic (): this {
+    return Object.create(Object.getPrototypeOf(this))
   }
 }

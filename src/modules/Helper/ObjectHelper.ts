@@ -76,3 +76,7 @@ export function objectPropsToSnakeCase (data: Dto) {
   })
   return result
 }
+
+export function objectClone (original: object) {
+  return Object.assign(Object.create(Object.getPrototypeOf(original)), original)
+}

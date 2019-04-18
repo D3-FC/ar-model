@@ -1,3 +1,4 @@
+export { ValidationError } from '../src/modules/Error/Validation/ValidationError'
 export { ApiContract } from '../src/modules/Api/ApiContract'
 export { LaravelApi } from '../src/modules/Api/LaravelApi'
 export { Dto } from '../src/modules/DAO/Dto'
