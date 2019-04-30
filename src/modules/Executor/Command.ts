@@ -1,10 +1,10 @@
-export type ExecutorCommand = (...args: any[]) => Promise<any>
+export type CommandCallback = (...args: any[]) => Promise<any>
 
-export default class Executor {
-  protected readonly command: ExecutorCommand
+export default class Command {
+  protected readonly cb: CommandCallback
 
   /**
-   * Currently running commands
+   * Currently running cbs
    */
   public runCount: number = 0 //
 
@@ -28,12 +28,12 @@ export default class Executor {
    */
   public wasRunBad: boolean = false
 
-  constructor (command: ExecutorCommand) {
-    this.command = command
+  constructor (cb: CommandCallback) {
+    this.cb = cb
   }
 
-  static createAndRun (command: ExecutorCommand): Executor {
-    const executor = new Executor(command)
+  static createAndRun (cb: CommandCallback): Command {
+    const executor = new Command(cb)
     executor.run()
     return executor
   }
@@ -46,15 +46,15 @@ export default class Executor {
   }
 
   /**
-   * @param parameters Arguments, will be passed down to command.
-   * @returns {Promise<any>} Promise result is formed from whatever you returned from command.
+   * @param parameters Arguments, will be passed down to cb.
+   * @returns {Promise<any>} Promise result is formed from whatever you returned from cb.
    */
   public run (...parameters: any[]): Promise<any> {
     this.beforeRun()
-    const promise = this.command(...parameters)
+    const promise = this.cb(...parameters)
     // NOTE This check was broken on second package import (package one < package two < executor)
     // if (!(promise instanceof Promise)) {
-    //   throw new Error('Executor command should return promise.')
+    //   throw new Error('Executor cb should return promise.')
     // }
     this.afterRun(promise)
     return promise

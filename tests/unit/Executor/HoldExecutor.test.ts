@@ -1,10 +1,10 @@
-import HoldExecutor from '../../../src/modules/Executor/HoldExecutor'
+import HoldableCommand from '../../../src/modules/Executor/HoldableCommand'
 import { sleep } from '../../../src/modules/Helper/AsyncHelpers'
 
 describe('HoldExecutor', () => {
   it('should run command only once', async (done) => {
     let runsCount = 0
-    const executor = new HoldExecutor(async () => {
+    const executor = new HoldableCommand(async () => {
       runsCount++
       await sleep(5)
       return runsCount

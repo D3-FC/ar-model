@@ -15,6 +15,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "clone": "^2.1.2",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.1",
     "vue-property-decorator": "^8.1.0",

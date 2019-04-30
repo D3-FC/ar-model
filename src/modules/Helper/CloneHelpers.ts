@@ -1,3 +1,6 @@
+// @ts-ignore
+import cloneSource from 'clone'
+
 export function clone<T> (data: T): T {
-  return JSON.parse(JSON.stringify(data))
+  return cloneSource(data)
 }

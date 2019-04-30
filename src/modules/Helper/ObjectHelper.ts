@@ -1,5 +1,6 @@
 import { Dto } from '../DAO/Dto'
 import { toCamelCase, toSnakeCase } from './StringHelpers'
+import { clone } from './CloneHelpers'
 
 export class IgnoreTransform implements Dto {
   [key: string]: any
@@ -78,5 +79,5 @@ export function objectPropsToSnakeCase (data: Dto) {
 }
 
 export function objectClone (original: object) {
-  return Object.assign(Object.create(Object.getPrototypeOf(original)), original)
+  return clone(original)
 }

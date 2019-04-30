@@ -1,10 +1,10 @@
-import Executor from '../../../src/modules/Executor/Executor'
+import Command from '../../../src/modules/Executor/Command'
 
 describe('Executor', () => {
   it('createAndRun', done => {
     let state = 'default'
 
-    const executor = Executor.createAndRun(() => {
+    const executor = Command.createAndRun(() => {
       return new Promise(resolve => {
         setTimeout(() => {
           state = 'changed'
@@ -23,7 +23,7 @@ describe('Executor', () => {
     let state = 'default'
 
     // Executor takes in the `state` scope and is able to change `state` asynchronously.
-    const executor = new Executor(value => {
+    const executor = new Command(value => {
       return new Promise((resolve) => {
         setTimeout(() => {
           state = 'changed'
@@ -39,7 +39,7 @@ describe('Executor', () => {
   })
 
   it('takes multiple arguments', done => {
-    const executor = new Executor(
+    const executor = new Command(
       async (one, two) => {
         expect(one).toBe('one')
         expect(two).toBe('two')
@@ -51,7 +51,7 @@ describe('Executor', () => {
   })
 
   it('returns whatever is returned', done => {
-    const executor = new Executor(async () => 'result')
+    const executor = new Command(async () => 'result')
     executor.run().then(result => {
       expect(result).toBe('result')
       done()
@@ -61,7 +61,7 @@ describe('Executor', () => {
   })
 
   it('counts simultaneous runs', (done) => {
-    const executor = new Executor(() => {
+    const executor = new Command(() => {
       return new Promise((resolve) => {
         setTimeout(resolve, 100)
       })

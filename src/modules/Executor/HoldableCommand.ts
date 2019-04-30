@@ -1,10 +1,10 @@
-import Executor from './Executor'
+import Command from './Command'
 
 /**
- * This executor won't let you execute 2 runs simultaneously.
+ * This command won't let you execute 2 runs simultaneously.
  * Busy requests will get infinite promise.
  */
-export default class HoldExecutor extends Executor {
+export default class HoldableCommand extends Command {
   promise: Promise<any> | null = null
 
   async run (...parameters: any[]): Promise<any> {

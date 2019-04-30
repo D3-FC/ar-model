@@ -6,9 +6,9 @@ import LaravelQuery from '../Query/LaravelQuery'
 import { ArCollection } from '../Collection/ArCollection'
 import { clone } from '../Helper/CloneHelpers'
 import { ModelContract } from '../Query/ModelContract'
-import { objectClone, objectPropsToCamelCase } from '../Helper/ObjectHelper'
+import { objectPropsToCamelCase } from '../Helper/ObjectHelper'
 import { getUIID } from '../Helper/StringHelpers'
-import HoldExecutor from '../Executor/HoldExecutor'
+import HoldableCommand from '../Executor/HoldableCommand'
 
 type ExecutorCommand = (...args: any[]) => Promise<any>
 // TODO: think how to make auto tests for api response and mapping
@@ -23,14 +23,14 @@ export default class ArModel implements ModelContract {
   protected readonly $idKey: string = 'id'
   protected $validation: ValidationError = new ValidationError()
 
-  protected readonly $updateExecutor: HoldExecutor = new HoldExecutor((...args: any) => this.updateAction(...args))
-  protected readonly $storeExecutor: HoldExecutor = new HoldExecutor((...args: any) => this.storeAction(...args))
-  protected readonly $destroyExecutor: HoldExecutor = new HoldExecutor((...args: any) => this.destroyAction(...args))
-  public $findExecutor: HoldExecutor = this.makeExecutor((...args: any) => this.findAction(...args))
-  public $freshExecutor: HoldExecutor = this.makeExecutor((...args: any) => this.freshAction(...args))
+  protected readonly $updateExecutor: HoldableCommand = new HoldableCommand((...args: any) => this.updateAction(...args))
+  protected readonly $storeExecutor: HoldableCommand = new HoldableCommand((...args: any) => this.storeAction(...args))
+  protected readonly $destroyExecutor: HoldableCommand = new HoldableCommand((...args: any) => this.destroyAction(...args))
+  public $findExecutor: HoldableCommand = this.makeExecutor((...args: any) => this.findAction(...args))
+  public $freshExecutor: HoldableCommand = this.makeExecutor((...args: any) => this.freshAction(...args))
 
   makeExecutor (cb: ExecutorCommand) {
-    return new HoldExecutor(cb)
+    return new HoldableCommand(cb)
   }
 
   constructor (api: ApiContract) {
@@ -341,13 +341,12 @@ export default class ArModel implements ModelContract {
    * NOTE: we also use that to clone model as temp solution
    */
   merge (modelData: ArModel | Dto): this {
-    if (!(modelData instanceof ArModel)) {
-      this.map(clone(modelData))
-    }
     if (modelData instanceof ArModel) {
       this.$hash = modelData.$hash
 
-      modelData.getAttributes().forEach(attribute => {
+      const attributes: string[] = [...this.getAttributes(), ...modelData.getAttributes()]
+
+      attributes.forEach(attribute => {
 
         const attributeValue = modelData[attribute]
         if ((attributeValue instanceof ArModel) || (attributeValue instanceof ArCollection)) {
@@ -366,13 +365,15 @@ export default class ArModel implements ModelContract {
         }
 
         if (typeof attributeValue === 'object') {
-          this[attribute] = objectClone(attributeValue)
+          this[attribute] = clone(attributeValue)
           return
         }
 
         this[attribute] = attributeValue
       })
+      return this
     }
+    this.map(clone(modelData))
     return this
   }
 
