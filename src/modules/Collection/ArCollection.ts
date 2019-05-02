@@ -66,7 +66,7 @@ export class ArCollection<T> {
     return new ArCollection(this.$items.map(cb))
   }
 
-  filter (cb: MapCb<T>) {
+  filter (cb: (value: (T & ArModel), index: number, array: (T & ArModel)[]) => boolean) {
     return this.$items.filter(cb)
   }
 
