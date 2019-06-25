@@ -1,6 +1,6 @@
 {
   "name": "ar-model",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": " Api requests Active records pattern implementation",
   "productName": "Ar Model",
   "author": "Dimitri <d3-fc@mail.ru>",
@@ -15,11 +15,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "clone": "^2.1.2",
-    "vue": "^2.6.10",
-    "vue-class-component": "^7.0.1",
-    "vue-property-decorator": "^8.1.0",
-    "vue-router": "^3.0.1"
+    "clone": "^2.1.2"
   },
   "devDependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.17",
@@ -44,7 +40,11 @@
     "sass-loader": "^7.1.0",
     "ts-jest": "^24.0.0",
     "typescript": "~3.3.4000",
+    "vue": "^2.6.10",
     "vue-book": "^0.0.19",
+    "vue-class-component": "^7.0.1",
+    "vue-property-decorator": "^8.1.0",
+    "vue-router": "^3.0.1",
     "vue-template-compiler": "^2.6.10"
   },
   "gitHooks": {
