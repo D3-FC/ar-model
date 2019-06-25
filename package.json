@@ -1,6 +1,6 @@
 {
   "name": "ar-model",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": " Api requests Active records pattern implementation",
   "productName": "Ar Model",
   "author": "Dimitri <d3-fc@mail.ru>",
