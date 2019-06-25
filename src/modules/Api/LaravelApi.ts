@@ -10,9 +10,11 @@ import { objectPropsToCamelCase, objectPropsToSnakeCase } from '../Helper/Object
 
 export class LaravelApi implements ApiContract {
   private readonly api: ApiInstance
+  private transformIgnore: string[]
 
-  constructor (api: ApiInstance) {
+  constructor (api: ApiInstance, config: { transformIgnore?: string[] } = {}) {
     this.api = api
+    this.transformIgnore = config.transformIgnore || []
   }
 
   transformData (data: Dto) {
@@ -90,11 +92,11 @@ export class LaravelApi implements ApiContract {
     if (response && response.data && response.data.data) {
       const data = response.data.data
       if (Array.isArray(data)) {
-        return data.map(item => objectPropsToCamelCase(item))
+        return data.map(item => objectPropsToCamelCase(item, this.transformIgnore))
       }
-      return objectPropsToCamelCase(response.data.data)
+      return objectPropsToCamelCase(response.data.data, this.transformIgnore)
     }
-    return objectPropsToCamelCase(response.data)
+    return objectPropsToCamelCase(response.data, this.transformIgnore)
   }
 
   private isNetworkErrorException (error: ApiProxyError) {

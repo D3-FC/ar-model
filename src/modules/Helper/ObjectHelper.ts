@@ -10,7 +10,7 @@ export class IgnoreTransform implements Dto {
   }
 }
 
-export function objectPropsToCamelCase (data: Dto) {
+export function objectPropsToCamelCase (data: Dto, ignore: string[] = []) {
   if (data instanceof IgnoreTransform) return data
 
   const props = Object.keys(data)
@@ -19,7 +19,7 @@ export function objectPropsToCamelCase (data: Dto) {
     const camelCaseProp = toCamelCase(prop)
     const propValue = data[prop]
 
-    if (!propValue) {
+    if (!propValue || ignore.includes(prop)) {
       result[camelCaseProp] = propValue
       return
     }
