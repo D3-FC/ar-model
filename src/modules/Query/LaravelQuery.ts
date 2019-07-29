@@ -64,9 +64,9 @@ export default class LaravelQuery implements QueryContract {
 
   paginate (page: number = 1, perPage: number = 30): Promise<Dto[]> {
     const payload = {
-      ...this.$criteria,
       page,
-      perPage
+      perPage,
+      ...this.$criteria,
     }
     return this.get(payload)
   }
